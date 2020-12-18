@@ -1,0 +1,39 @@
+
+
+    <h1>Courses</h1>
+    {{#if courses.length}}
+        {{#each courses}}
+            <div class="row">
+
+                <div class="col s6 offset-s3">
+
+                    <div class="card">
+
+                        <div class="card-image">
+                            <img src="{{img}}"/>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-title">{{title}}</span>
+                            <p class="price">{{price}}</p>
+                        </div>
+                        <div class="card-action actions">
+                            <!--Таргет-бланк = это чтобы курс открывался на новой странице-->
+                            <a href="/courses/{{id}}" target="_blank">Buy now</a>
+                            <a href="/courses/{{id}}/edit?allow=true" >Edit now</a>
+                            <form action="/card/add" method="post" >
+                                <input type="hidden" name="id" value="{{id}}">
+                                <button type="submit" class="btn btn-primary"> Buy</button>
+                            </form>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        {{/each}}
+    {{else}}
+        <p> no Courses</p>
+    {{/if}}
+
+
