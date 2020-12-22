@@ -1,5 +1,5 @@
 const {Router} = require("express")
-const bcrypt = require("bcryptjs")
+const bcrypt = require("bcryptjs") // библиотека для хэширования пароля
 const User = require("../models/user")
 const router = Router()
     router.get("/login", async (req,res)=>{

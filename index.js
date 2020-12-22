@@ -14,6 +14,7 @@ const session = require("express-session") // импорт библиотеки 
 const MongoStore = require("connect-mongodb-session")(session) // это пакет чтобы сохранять сессию в бд. важно подключать его уже после поднлючения session
 const varMiddleware = require("./middleware/variables")
 const userMiddleware = require("./middleware/user")
+const csrf = require("csurf") // пакет для безопасности от кросс-платформенных уязвимостей
 
 // uri для подключения к бд
 const PASSWORD = "eHMcaG1t7sI9gmFH"
@@ -60,6 +61,8 @@ app.use(session({
     saveUninitialized: false,
     store
 }))
+
+app.use(csrf()) // сразу после вызова сессии мы подключаем наш csurf для защиты от уязвимостей кросс-платформенных
 app.use(varMiddleware) // добавляем функцию мидлвеер - в данный момент это isauth
 app.use(userMiddleware) // здесь мы добавили функцию чтобы ипользовать метод AddToCard урок 055
 
