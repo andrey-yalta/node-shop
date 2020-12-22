@@ -17,17 +17,33 @@ const router = Router()
 
     })
 
-    router.post("/login", async (req, res)=>{
-         // ждем пока получим пользователя
-        req.session.user = await User.findById("5fdce0c33195143d24509b8f")
-        req.session.isAuthentificated = true
-        req.session.save((err)=>{
-            // этот метод вызван чтобы мы сначала получили пользователя, а толко потом делали редирект
-            if(err){
-                throw err
+     router.post("/login", async (req, res)=>{
+        try{
+            const {email, password} =  req.body
+            const candidate = await  User.findOne({email})
+            if(candidate){
+                const isSame = password === candidate.password
+                if(isSame){
+                    // ждем пока получим пользователя
+                    req.session.user =candidate
+                    req.session.isAuthentificated = true
+                    req.session.save((err)=>{
+                        // этот метод вызван чтобы мы сначала получили пользователя, а толко потом делали редирект
+                        if(err){
+                            throw err
+                        }
+                        res.redirect("/")
+                    })
+                }else{
+                    res.redirect("/auth/login#login")
+                }
+            }else{
+                res.redirect("/auth/login#login")
             }
-            res.redirect("/")
-        })
+        } catch (e) {
+            console.log(e)
+        }
+
 
     })
 
