@@ -9,12 +9,13 @@ const ordersRoutes = require("./routes/orders")
 const authRoutes = require("./routes/auth")
 const app = express() // создаем экземпляр класса эспресс = сервер
 const mongoose = require("mongoose") //  библиотека для подключения и работы с бд
-const User = require("./models/user")
 const session = require("express-session") // импорт библиотеки для создания сессии
 const MongoStore = require("connect-mongodb-session")(session) // это пакет чтобы сохранять сессию в бд. важно подключать его уже после поднлючения session
 const varMiddleware = require("./middleware/variables")
 const userMiddleware = require("./middleware/user")
 const csrf = require("csurf") // пакет для безопасности от кросс-платформенных уязвимостей
+const flash = require("connect-flash") // пакет для того чтобы передавать ошибки в редирект
+
 
 // uri для подключения к бд
 const PASSWORD = "eHMcaG1t7sI9gmFH"
@@ -63,6 +64,7 @@ app.use(session({
 }))
 
 app.use(csrf()) // сразу после вызова сессии мы подключаем наш csurf для защиты от уязвимостей кросс-платформенных
+app.use(flash()) // нужен чтобы прокидывать ошибки внурть ререндеренных страниц
 app.use(varMiddleware) // добавляем функцию мидлвеер - в данный момент это isauth
 app.use(userMiddleware) // здесь мы добавили функцию чтобы ипользовать метод AddToCard урок 055
 

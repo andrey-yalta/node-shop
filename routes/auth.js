@@ -6,6 +6,8 @@ const router = Router()
         res.render("auth/login",{
             title: "Authorization",
             isLogin: true,
+            registerError: req.flash("registerError"),// получение ошибки если она есть
+            loginError: req.flash("loginError")
 
         })
     })
@@ -36,9 +38,11 @@ const router = Router()
                         res.redirect("/")
                     })
                 }else{
+                    req.flash("loginError", "bad password")
                     res.redirect("/auth/login#login")
                 }
             }else{
+                req.flash("loginError", "User not found")
                 res.redirect("/auth/login#login")
             }
         } catch (e) {
@@ -54,7 +58,8 @@ const router = Router()
             const{email, password, repeat, name} = req.body
             const candidate = await User.findOne({email})
             if(candidate){
-                res.redirect(" /auth/login#register")
+                req.flash("registerError", "user with this email already exists") // прокидываение ошибки
+                res.redirect("/auth/login#register")
             }else{
                 const hashPassword = await bcrypt.hash(password, 10)
                 const user = new User({
