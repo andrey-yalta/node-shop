@@ -16,13 +16,18 @@
             <td>{{title}}</td>
             <td>{{count}}</td>
             <td>
-                <button class="btn btn-small js-remove" data-id="{{id}}">delete</button>
+                <button class="btn btn-small js-remove" data-id="{{_id}}">delete</button>
             </td>
         </tr>
         {{/each}}
         </tbody>
     </table>
     <p><strong>Price</strong> <span class="price">{{price}}</span></p>
+    <form action="/orders" method="post">
+        <button type="submit" class="btn">
+            Сделать заказ
+        </button>
+    </form>
 {{else}}
     <p>Card is empty</p>
 {{/if}}

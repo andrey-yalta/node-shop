@@ -19,15 +19,19 @@
                         <div class="card-action actions">
                             <!--Таргет-бланк = это чтобы курс открывался на новой странице-->
                             <a href="/courses/{{id}}" target="_blank">Buy now</a>
-                            <a href="/courses/{{id}}/edit?allow=true" >Edit now</a>
-                            <form action="/card/add" method="post" >
-                                <input type="hidden" name="id" value="{{id}}">
-                                <button type="submit" class="btn btn-primary"> Buy</button>
-                            </form>
-                            <form action="/courses/remove" method="post" class="course-remove">
-                                <input type="hidden" name="id" value="{{course.id}}">
-                                <button class="btn red"> remove</button>
-                            </form>
+                            <!--ниже использована хуйня чтобы выйти из локальной зоны видимости и читать с глобальной-->
+                            {{#if @root.isAuth}}
+                                <a href="/courses/{{id}}/edit?allow=true" >Edit now</a>
+                                <form action="/card/add" method="post" >
+                                    <input type="hidden" name="id" value="{{id}}">
+                                    <button type="submit" class="btn btn-primary"> Buy</button>
+                                </form>
+                            {{/if}}
+
+<!--                            <form action="/courses/remove" method="post" class="course-remove">-->
+<!--                                <input type="hidden" name="id" value="{{course.id}}">-->
+<!--                                <button class="btn red"> remove</button>-->
+<!--                            </form>-->
                         </div>
 
                     </div>

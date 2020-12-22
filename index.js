@@ -5,9 +5,20 @@ const homeRoutes = require("./routes/home")
 const cardRoutes = require("./routes/card")
 const addRoutes = require("./routes/add")
 const coursesRoutes = require("./routes/courses")
+const ordersRoutes = require("./routes/orders")
+const authRoutes = require("./routes/auth")
 const app = express() // создаем экземпляр класса эспресс = сервер
 const mongoose = require("mongoose") //  библиотека для подключения и работы с бд
 const User = require("./models/user")
+const session = require("express-session") // импорт библиотеки для создания сессии
+const MongoStore = require("connect-mongodb-session")(session) // это пакет чтобы сохранять сессию в бд. важно подключать его уже после поднлючения session
+const varMiddleware = require("./middleware/variables")
+const userMiddleware = require("./middleware/user")
+
+// uri для подключения к бд
+const PASSWORD = "eHMcaG1t7sI9gmFH"
+const MONGODB_URI = 'mongodb+srv://andrey:eHMcaG1t7sI9gmFH@cluster0.ovxev.mongodb.net/shop'
+
 
 // решение вопроса
 const Handlebars = require('handlebars')
@@ -22,56 +33,56 @@ const hbs = exphbs.create({
 })
 
 
+const store = new MongoStore({
+    // прикольная штука, если мы подключаем сессию после авторизации с помощью библиотеки session то мы сохраняем
+    // в базу данныз в ветку session данные об входе
+    // если мы выходим - данные удаляются из базы данных
+    collection: "sessions",
+    uri:MONGODB_URI
+})
+
+
 // регистрируем движок для рендеринга html страниц
 app.engine('hbs', hbs.engine) // просто регистрация движка в экспрессе
 app.set('view engine', "hbs") // используем движок в нашем приложении
 app.set('views', 'views') // здесь мы указываем папку, где будут хранится html = первый параметр - название настройки, второй - папка
 
-app.use(async(req,res,next)=>{
-    try{
-        req.user = await User.findById("5fdce0c33195143d24509b8f")
-        next()
-    }
-    catch (e) {
-        console.log(e)
-    }
-
-})
 
 
 // регистрируем публичную статическую папку, в которой можно хранить общие стили например
 app.use(express.static(path.join(__dirname, 'public')))
 // добавляем новый функционал для пост запроса который обрабатывает значения
 app.use(express.urlencoded({extended:true}))
+//настройка сессии
+app.use(session({
+    secret: "some secret value",
+    resave: false,
+    saveUninitialized: false,
+    store
+}))
+app.use(varMiddleware) // добавляем функцию мидлвеер - в данный момент это isauth
+app.use(userMiddleware) // здесь мы добавили функцию чтобы ипользовать метод AddToCard урок 055
 
 //прописываем урлы и прокидываем на них html
 app.use("/",homeRoutes)
 app.use("/add",addRoutes)
 app.use("/courses", coursesRoutes)
 app.use("/card", cardRoutes)
+app.use("/orders", ordersRoutes)
+app.use("/auth", authRoutes)
 
-const PASSWORD = "eHMcaG1t7sI9gmFH"
-const url = `mongodb+srv://andrey:${PASSWORD}@cluster0.ovxev.mongodb.net//todos`
 
 // создаем переменную порт = берет служебную переменую свободную или 3000 ?
 const PORT = process.env.PORT || 3000
 
 async function start(){
     try {
-        await mongoose.connect('mongodb+srv://andrey:eHMcaG1t7sI9gmFH@cluster0.ovxev.mongodb.net/shop',{
+        await mongoose.connect(MONGODB_URI,{
             useNewUrlParser:true,
             useFindAndModify:false,
             useUnifiedTopology: true,
         })
-        const candidate = await User.findOne() // проверяем есть ли что нибудь в бд User
-        if(!candidate){ // если нет. то создаем нового пользователя
-            const user = new User({
-                email: "andrey@mail.ry",
-                name: "andrey",
-                cart:{items:[]}
-            })
-            await  user.save() // сохраняем данные
-        }
+
 
         app.listen(PORT, ()=>{
             console.log(`server is running on port ${PORT}`)
