@@ -15,12 +15,12 @@ const varMiddleware = require("./middleware/variables")
 const userMiddleware = require("./middleware/user")
 const csrf = require("csurf") // пакет для безопасности от кросс-платформенных уязвимостей
 const flash = require("connect-flash") // пакет для того чтобы передавать ошибки в редирект
-
+const keys = require("./keys")
 
 // uri для подключения к бд
-const PASSWORD = "eHMcaG1t7sI9gmFH"
-const MONGODB_URI = 'mongodb+srv://andrey:eHMcaG1t7sI9gmFH@cluster0.ovxev.mongodb.net/shop'
-
+// const PASSWORD = "eHMcaG1t7sI9gmFH"
+// const MONGODB_URI = 'mongodb+srv://andrey:eHMcaG1t7sI9gmFH@cluster0.ovxev.mongodb.net/shop'
+//
 
 // решение вопроса
 const Handlebars = require('handlebars')
@@ -40,7 +40,7 @@ const store = new MongoStore({
     // в базу данныз в ветку session данные об входе
     // если мы выходим - данные удаляются из базы данных
     collection: "sessions",
-    uri:MONGODB_URI
+    uri:keys.MONGODB_URI
 })
 
 
@@ -57,7 +57,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({extended:true}))
 //настройка сессии
 app.use(session({
-    secret: "some secret value",
+    secret: keys.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store
@@ -82,7 +82,7 @@ const PORT = process.env.PORT || 3000
 
 async function start(){
     try {
-        await mongoose.connect(MONGODB_URI,{
+        await mongoose.connect(keys.MONGODB_URI,{
             useNewUrlParser:true,
             useFindAndModify:false,
             useUnifiedTopology: true,
