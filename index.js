@@ -20,7 +20,7 @@ const keys = require("./keys")
 // uri для подключения к бд
 // const PASSWORD = "eHMcaG1t7sI9gmFH"
 // const MONGODB_URI = 'mongodb+srv://andrey:eHMcaG1t7sI9gmFH@cluster0.ovxev.mongodb.net/shop'
-//
+//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
 
 // решение вопроса
 const Handlebars = require('handlebars')
