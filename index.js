@@ -30,8 +30,8 @@ const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-acce
 const hbs = exphbs.create({
     defaultLayout: "main", // это пакет по умолчанию - первый hbs файл - его надо создать в папке views/layouts
     extname:"hbs", // это для сокращения кода, когда обращаемся с библиотеке
-    handlebars: allowInsecurePrototypeAccess(Handlebars) /// хуйня чтобы решить проблему с ошибкой доступа
-
+    handlebars: allowInsecurePrototypeAccess(Handlebars), /// хуйня чтобы решить проблему с ошибкой доступа
+    helpers:require("./utils/hbs-helpers")
 })
 
 
