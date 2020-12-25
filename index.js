@@ -15,7 +15,8 @@ const varMiddleware = require("./middleware/variables")
 const userMiddleware = require("./middleware/user")
 const errorHandler = require("./middleware/error")
 const profileRoutes = require("./routes/profile")
-
+const helmet = require("helmet") // пакет для добавления хедеров - для защиты от атак
+const compression = require("compression") // пакет для сжатия ссылок
 const csrf = require("csurf") // пакет для безопасности от кросс-платформенных уязвимостей
 const flash = require("connect-flash") // пакет для того чтобы передавать ошибки в редирект
 const keys = require("./keys")
@@ -70,6 +71,8 @@ app.use(session({
 app.use(fileMiddleware.single("avatar"))
 app.use(csrf()) // сразу после вызова сессии мы подключаем наш csurf для защиты от уязвимостей кросс-платформенных
 app.use(flash()) // нужен чтобы прокидывать ошибки внурть ререндеренных страниц
+app.use(helmet()) // пакет нужен для защит от атак - нужно погуглить
+app.use(compression()) // эта функция чтобы сжимать url ссылки. оптимизация для статических файлов
 app.use(varMiddleware) // добавляем функцию мидлвеер - в данный момент это isauth
 app.use(userMiddleware) // здесь мы добавили функцию чтобы ипользовать метод AddToCard урок 055
 
