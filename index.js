@@ -13,9 +13,13 @@ const session = require("express-session") // импорт библиотеки 
 const MongoStore = require("connect-mongodb-session")(session) // это пакет чтобы сохранять сессию в бд. важно подключать его уже после поднлючения session
 const varMiddleware = require("./middleware/variables")
 const userMiddleware = require("./middleware/user")
+const errorHandler = require("./middleware/error")
+const profileRoutes = require("./routes/profile")
+
 const csrf = require("csurf") // пакет для безопасности от кросс-платформенных уязвимостей
 const flash = require("connect-flash") // пакет для того чтобы передавать ошибки в редирект
 const keys = require("./keys")
+const fileMiddleware = require("./middleware/file")
 
 // uri для подключения к бд
 // const PASSWORD = "eHMcaG1t7sI9gmFH"
@@ -31,7 +35,7 @@ const hbs = exphbs.create({
     defaultLayout: "main", // это пакет по умолчанию - первый hbs файл - его надо создать в папке views/layouts
     extname:"hbs", // это для сокращения кода, когда обращаемся с библиотеке
     handlebars: allowInsecurePrototypeAccess(Handlebars), /// хуйня чтобы решить проблему с ошибкой доступа
-    helpers:require("./utils/hbs-helpers")
+    helpers: require("./utils/hbs-helpers")
 })
 
 
@@ -52,7 +56,8 @@ app.set('views', 'views') // здесь мы указываем папку, гд
 
 
 // регистрируем публичную статическую папку, в которой можно хранить общие стили например
-app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'public'))) // здесь мы задаем путь к корневой папке откуда будут доступны файлы типа app.css  index.html
+app.use('/images', express.static(path.join(__dirname, 'images'))) // примерно тоже самое что и выше, содержимое папки images будет доступна с корня
 // добавляем новый функционал для пост запроса который обрабатывает значения
 app.use(express.urlencoded({extended:true}))
 //настройка сессии
@@ -62,7 +67,7 @@ app.use(session({
     saveUninitialized: false,
     store
 }))
-
+app.use(fileMiddleware.single("avatar"))
 app.use(csrf()) // сразу после вызова сессии мы подключаем наш csurf для защиты от уязвимостей кросс-платформенных
 app.use(flash()) // нужен чтобы прокидывать ошибки внурть ререндеренных страниц
 app.use(varMiddleware) // добавляем функцию мидлвеер - в данный момент это isauth
@@ -75,6 +80,9 @@ app.use("/courses", coursesRoutes)
 app.use("/card", cardRoutes)
 app.use("/orders", ordersRoutes)
 app.use("/auth", authRoutes)
+app.use("/profile",profileRoutes)
+
+app.use(errorHandler) // это роут ошибки, он подключается в самом конце после всех - иначе будет ошибка
 
 
 // создаем переменную порт = берет служебную переменую свободную или 3000 ?

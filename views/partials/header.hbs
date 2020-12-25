@@ -33,6 +33,13 @@
                 {{else}}
                     <li> <a href="/orders"> Order</a></li>
                 {{/if}}
+
+                {{#if isProfile}}
+                    <li class="active"> <a href="/profile"> Profile</a></li>
+                {{else}}
+                    <li> <a href="/profile"> Profile</a></li>
+                {{/if}}
+
                 <li> <a href="/auth/Logout"> Logout</a></li>
 
             {{else}}
@@ -41,6 +48,7 @@
                 {{else}}
                     <li> <a href="/auth/login#login"> Login</a></li>
                 {{/if}}
+
             {{/if}}
 
         </ul>

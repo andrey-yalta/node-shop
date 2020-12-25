@@ -2,6 +2,7 @@ const {Router} = require("express")
 const bcrypt = require("bcryptjs") // библиотека для хэширования пароля
 const User = require("../models/user")
 const nodemailer = require("nodemailer")
+const {body, validationResult} = require("express-validator/check")
 const sendgrid = require("nodemailer-sendgrid-transport")
 const router = Router()
 const keys = require("../keys")
@@ -10,6 +11,7 @@ const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(keys. SENDGRID_API_KEY)
 const crypto =  require("crypto")
 const resetEmail = require("../emails/reset")
+const {registerValidators} = require("../utils/validators")
 
 const transporter = nodemailer.createTransport(sendgrid({
     auth:{api_key: keys.SENDGRID_API_KEY}
@@ -65,10 +67,17 @@ const transporter = nodemailer.createTransport(sendgrid({
     })
 
 
-    router.post("/register", async (req,res)=>{
+    router.post("/register",registerValidators, async (req,res)=>{
         try{
-            const{email, password, repeat, name} = req.body
+            const{email, password,  confirm, name} = req.body
             const candidate = await User.findOne({email})
+
+             const errors = validationResult(req) // получает результат ошибок
+            if(!errors.isEmpty()){ // служебная переменная, которая содержит ошибки. Мы проверяем пуста ли она
+                req.flash('registerError', errors.array()[0].msg) // если нет - то выводим ошибку
+                return res.status(422).redirect("/auth/login#register") // возвращаем статус 422 - это статус ошибки валидации и редирект
+            }
+
             if(candidate){
                 req.flash("registerError", "user with this email already exists") // прокидываение ошибки
                 res.redirect("/auth/login#register")
